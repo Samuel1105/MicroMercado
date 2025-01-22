@@ -8,5 +8,4 @@ const nextConfig = {
     output: 'standalone'
 };
 
-// Exportación CommonJS
-module.exports = nextConfig;
+export default nextConfig;
