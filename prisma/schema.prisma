@@ -71,16 +71,6 @@ model Proveedor {
   Producto Producto[]
 }
 
-model sysdiagrams {
-  name         String @db.NVarChar(128)
-  principal_id Int
-  diagram_id   Int    @id(map: "PK__sysdiagr__C2B05B618D4A0501") @default(autoincrement())
-  version      Int?
-  definition   Bytes?
-
-  @@unique([principal_id, name], map: "UK_principal_name")
-}
-
 model UnidadMedida {
   id                Int                 @id(map: "PK_UnidadMedida") @default(autoincrement()) @db.TinyInt
   nombre            String              @db.NVarChar(50)
@@ -130,8 +120,6 @@ model IngresoAlmacen {
   fechaIngreso      DateTime?      @default(now(), map: "DF__IngresoAl__fecha__5D95E53A") @db.DateTime
   usuarioIngreso    Int            @db.TinyInt
   DetalleCompras    DetalleCompras @relation(fields: [detalleCompraID], references: [id], onUpdate: NoAction, map: "FK_IngresoAlmacen_DetalleCompras")
-
-  @@index([detalleCompraID], map: "IX_IngresoAlmacen_DetalleCompraID")
 }
 
 model MovimientoAlmacen {
@@ -150,8 +138,6 @@ model MovimientoAlmacen {
   Lote             Lote?          @relation(fields: [loteID], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_MovimientoAlmacen_Lote")
   Producto         Producto       @relation(fields: [productoID], references: [id], onUpdate: NoAction, map: "FK_MovimientoAlmacen_Producto")
   UnidadMedida     UnidadMedida   @relation(fields: [unidadMedidaID], references: [id], onUpdate: NoAction, map: "FK_MovimientoAlmacen_UnidadMedida")
-
-  @@index([detalleComprasID], map: "IX_MovimientoAlmacen_DetalleComprasID")
 }
 
 model Cliente {
@@ -202,6 +188,4 @@ model Lote {
   usuarioRegistro   Int?                @db.TinyInt
   DetalleCompras    DetalleCompras      @relation(fields: [detalleCompraID], references: [id], onUpdate: NoAction, map: "FK_Lote_DetalleCompras")
   MovimientoAlmacen MovimientoAlmacen[]
-
-  @@index([detalleCompraID], map: "IX_Lote_DetalleCompraID")
 }
