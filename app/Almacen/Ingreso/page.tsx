@@ -365,6 +365,22 @@ export default function Page() {
     />
   );
 
+  const selectItems = [
+    <SelectItem key="unidad" value="unidad">
+      Por Unidad
+    </SelectItem>,
+  ];
+  
+  // Validar `selectedCompra` antes de acceder a sus propiedades
+  if (selectedCompra && selectedCompra.cantidadMayor && selectedCompra.unidadesPorMayor) {
+    selectItems.push(
+      <SelectItem key="mayor" value="mayor">
+        Por Mayor
+      </SelectItem>
+    );
+  }
+    
+
   return (
     <div className="p-4 flex flex-col">
       <div className="w-full mb-4">
@@ -458,18 +474,13 @@ export default function Page() {
                 <TableRow>
                   <TableCell>Tipo de Ingreso</TableCell>
                   <TableCell>
-                    <Select
+                     <Select
                       label="Tipo de Ingreso"
                       value={tipoIngreso}
                       onChange={(e) => setTipoIngreso(e.target.value as "unidad" | "mayor")}
                       isDisabled={!selectedCompra.cantidadMayor || !selectedCompra.unidadesPorMayor}
                     >
-                      {[
-                      <SelectItem key="unidad" value="unidad">Por Unidad</SelectItem>,
-                      selectedCompra.cantidadMayor && selectedCompra.unidadesPorMayor ? (
-                        <SelectItem key="mayor" value="mayor">Por Mayor</SelectItem>
-                      ) : <></>
-                    ].filter(Boolean)}
+                      {selectItems}
                     </Select>
                   </TableCell>
                 </TableRow>
