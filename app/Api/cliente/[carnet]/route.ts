@@ -1,4 +1,4 @@
-// /app/api/cliente/carnet/[carnet]/route.ts
+// /app/api/cliente/[carnet]/route.ts
 import prisma from "@/lib/prisma";
 import { NextResponse } from "next/server";
 
@@ -7,21 +7,18 @@ export async function GET(
   { params }: { params: { carnet: string } }
 ) {
   const carnet = params.carnet;
-
   try {
-    const cliente = await prisma.cliente.findFirst({
+    const clientes = await prisma.cliente.findMany({
       where: {
-        carnet: carnet,
+        carnet: {
+          startsWith: carnet
+        }
       },
+      take: 5
     });
-
-    if (!cliente) {
-      return NextResponse.json({ error: "Cliente no encontrado" }, { status: 404 });
-    }
-
-    return NextResponse.json(cliente);
+    return NextResponse.json(clientes);
   } catch (error) {
-    console.error("Error al buscar el cliente:", error);
+    console.error("Error al buscar clientes:", error);
     return NextResponse.json({ error: "Error interno del servidor" }, { status: 500 });
   }
 }

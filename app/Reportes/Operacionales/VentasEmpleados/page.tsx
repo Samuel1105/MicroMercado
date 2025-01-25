@@ -83,7 +83,10 @@ export default function VentasEmpleadosPage() {
     return data.filter(empleado => 
       empleado.nombreEmpleado.toLowerCase().includes(searchTerm.toLowerCase())
     ).sort((a, b) => b.totalVentas - a.totalVentas);
+    
   }, [data, searchTerm]);
+
+  console.log(data)
 
   // Formatear moneda
   const formatMoney = (amount: number) => `Bs. ${amount.toFixed(2)}`;
@@ -319,7 +322,7 @@ export default function VentasEmpleadosPage() {
                           {selectedEmpleado.cantidadVentas}
                         </p>
                       </div>
-                      <div className="p-4 bg-purple-50 rounded-lg"></div>
+                     
                       <div className="p-4 bg-purple-50 rounded-lg">
                         <p className="text-sm text-purple-600">Promedio por Venta</p>
                         <p className="text-xl font-bold text-purple-900">

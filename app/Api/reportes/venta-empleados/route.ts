@@ -92,12 +92,13 @@ export async function GET(req: NextRequest) {
         id: {
           in: empleadosIds,
         },
-        rol: 2, // Rol de vendedor
+        //rol: 2, // Rol de vendedor
       },
       select: {
         id: true,
         primerNombre: true,
         apellidoPaterno: true,
+        rol:true
       },
     });
 

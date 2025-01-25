@@ -1,7 +1,7 @@
 'use client'
 import React, { useState, useEffect, useRef } from 'react';
-import { Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Input, Button, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Checkbox } from "@nextui-org/react";
-import { Package, ChevronLeft, ChevronRight, Search, ShoppingCart, Trash2, Barcode } from 'lucide-react';
+import { Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Input, Button, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Checkbox, Autocomplete, AutocompleteItem } from "@nextui-org/react";
+import { Package, ChevronLeft, ChevronRight, Search, ShoppingCart, Trash2, Barcode, XCircle } from 'lucide-react';
 import axios from 'axios';
 import Swal from 'sweetalert2';
 import { useAuth } from '@/app/context/AuthContext';
@@ -53,6 +53,7 @@ export default function VentaComponent() {
   const [registrarCliente, setRegistrarCliente] = useState(false);
   const [cliente, setCliente] = useState<Cliente>({ carnet: '', nombre: '', correo: '' });
   const [clienteEncontrado, setClienteEncontrado] = useState<Cliente | null>(null);
+  const [clientesBusqueda, setClientesBusqueda] = useState<Cliente[]>([]);
   const [montoRecibido, setMontoRecibido] = useState<number>(0);
   const [cambio, setCambio] = useState<number>(0);
   
@@ -641,25 +642,72 @@ export default function VentaComponent() {
             </Checkbox>
             {registrarCliente && (
               <div className="space-y-4">
-                <Input
+                <Autocomplete
                   label="Carnet"
-                  placeholder="Ingrese el carnet"
+                  placeholder="Ingrese el carnet del cliente"
+                  items={clientesBusqueda}
+                  allowsCustomValue
                   value={cliente.carnet}
-                  onChange={handleCarnetChange}
-                  onKeyDown={handleCarnetKeyDown}
-                />
+                  selectedKey={clienteEncontrado?.id?.toString()}
+                  endContent={
+                    <Button
+                      size="sm"
+                      variant="light"
+                      isIconOnly
+                      onClick={() => {
+                        setCliente({ carnet: '', nombre: '', correo: '' });
+                        setClienteEncontrado(null);
+                        setClientesBusqueda([]);
+                      }}
+                    >
+                      <XCircle className="h-4 w-4" />
+                    </Button>
+                  }
+                  onInputChange={async (value) => {
+                    setCliente(prev => ({ ...prev, carnet: value }));
+                    if (value.length >= 2) {
+                      try {
+                        const response = await axios.get<Cliente[]>(`/Api/cliente/${value}`);
+                        setClientesBusqueda(response.data);
+                      } catch {
+                        setClientesBusqueda([]);
+                      }
+                    } else {
+                      setClientesBusqueda([]);
+                    }
+                  }}
+                  onSelectionChange={(key) => {
+                    if (key) {
+                      const selectedClient = clientesBusqueda.find(c => c.id?.toString() === key.toString());
+                      if (selectedClient) {
+                        setCliente(selectedClient);
+                        setClienteEncontrado(selectedClient);
+                      }
+                    }
+                  }}
+                >
+                  {(cliente: Cliente) => (
+                    <AutocompleteItem
+                      key={cliente.id?.toString() || cliente.carnet}
+                      textValue={cliente.carnet}
+                    >
+                      <div className="flex flex-col">
+                        <span className="font-medium">{cliente.carnet}</span>
+                        <span className="text-sm text-gray-600">{cliente.nombre}</span>
+                      </div>
+                    </AutocompleteItem>
+                  )}
+                </Autocomplete>
                 <Input
                   label="Nombre"
-                  placeholder="Ingrese el nombre"
                   value={cliente.nombre}
-                  onChange={(e) => setCliente({...cliente, nombre: e.target.value})}
+                  onChange={(e) => setCliente({ ...cliente, nombre: e.target.value })}
                   disabled={!!clienteEncontrado}
                 />
                 <Input
                   label="Correo"
-                  placeholder="Ingrese el correo electrónico"
                   value={cliente.correo}
-                  onChange={(e) => setCliente({...cliente, correo: e.target.value})}
+                  onChange={(e) => setCliente({ ...cliente, correo: e.target.value })}
                   disabled={!!clienteEncontrado}
                 />
                 {!clienteEncontrado && cliente.carnet && (
